@@ -16,8 +16,10 @@
 
 package com.example.android.observability.ui;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
@@ -71,11 +73,17 @@ public class UserActivity extends AppCompatActivity {
         // Subscribe to the emissions of the user name from the view model.
         // Update the user name text view, at every onNext emission.
         // In case of error, log the exception.
-        mDisposable.add(mViewModel.getUserName()
+        /*mDisposable.add(mViewModel.getUserName()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(userName -> mUserName.setText(userName),
-                        throwable -> Log.e(TAG, "Unable to update username", throwable)));
+                        throwable -> Log.e(TAG, "Unable to update username", throwable)));*/
+        mViewModel.getUserNameFlowable().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                mUserName.setText(s);
+            }
+        });
     }
 
     @Override

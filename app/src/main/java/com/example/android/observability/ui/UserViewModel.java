@@ -16,9 +16,13 @@
 
 package com.example.android.observability.ui;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.ViewModel;
+
 import com.example.android.observability.UserDataSource;
 import com.example.android.observability.persistence.User;
+
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 
@@ -50,6 +54,17 @@ public class UserViewModel extends ViewModel {
 
     }
 
+    public LiveData<String> getUserNameFlowable() {
+
+        return LiveDataReactiveStreams.fromPublisher(mDataSource.getUser()
+                // for every emission of the user, get the user name
+                .map(user -> {
+                    mUser = user;
+                    return user.getUserName();
+                }));
+
+    }
+
     /**
      * Update the user name.
      *
@@ -67,5 +82,10 @@ public class UserViewModel extends ViewModel {
 
             mDataSource.insertOrUpdateUser(mUser);
         });
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
     }
 }
